@@ -14,9 +14,18 @@ void setup() {
     digitalWrite(relay_enable_pin, LOW);
 
     myRFID.AddicoreRFID_Init(); 
-  
-  
-    lcd.print("LCD Test !");                  // Print a message to the LCD.
+    
+
+    
+    lcd.print("EEPROM DATA:");
     lcd.setCursor(0, 1);
-    lcd.print("RFID Lock Sys");
+    lcd.print(  String(EEPROM.read(0)) + "," + 
+                String(EEPROM.read(1)) + "," + 
+                String(EEPROM.read(2)) + "," + 
+                String(EEPROM.read(3))          );
+    
+  
 }//-------------------------------------------------------------------------------------------------
+
+
+

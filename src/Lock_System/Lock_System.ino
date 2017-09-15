@@ -18,7 +18,7 @@
     LCD D4 pin to digital pin 5
     LCD D5 pin to digital pin 4
     LCD D6 pin to digital pin 3
-    LCD D7 pin to digital pin 2
+    LCD D7 pin to digital pin 8
     LCD R/W pin to ground
     10K potentiometer:
     ends to +5V and ground
@@ -44,12 +44,12 @@
 #include <AddicoreRFID.h>                   // include the library code:
 #include <SPI.h>
 #include <LiquidCrystal.h>
-
+#include <EEPROM.h>
 
 #define MAX_LEN 16                          // Maximum length of the array
 
 
-LiquidCrystal lcd(7, 6, 5, 4, 3, 2);        // initialize the library with the numbers of the interface pins
+LiquidCrystal lcd(7, 6, 5, 4, 3, 8);        // initialize the library with the numbers of the interface pins
 AddicoreRFID myRFID;                        // create AddicoreRFID object to control the RFID module
 
 

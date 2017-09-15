@@ -4,31 +4,12 @@ void loop() {
     unsigned char str[MAX_LEN];
     unsigned char status;
     
-
   
     status = myRFID.AddicoreRFID_Request(PICC_REQIDL, str);
 
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    
-    /*
-    if (status == MI_OK)
-    {
-        lcd.clear();
-        lcd.setCursor(0, 0);
-        lcd.print("Tag detected");
-        delay(500);   
-    }
-    else
-    {
-        lcd.clear();
-        lcd.setCursor(0, 0);
-        lcd.print("No Tag");
-        delay(500);   
-    }
-    */
 
     status = myRFID.AddicoreRFID_Anticoll(str);
+    
     if (status == MI_OK)
     {
         // Print RFID Tag to LCD
@@ -39,16 +20,23 @@ void loop() {
         
         relay_on = !relay_on ;
         
-        delay(1000);
-    
+        
+        
+        // Write to EEPROM
+        //---------------------------------------
+        EEPROM.write(0, str[0]);
+        EEPROM.write(1, str[1]);
+        EEPROM.write(2, str[2]);
+        EEPROM.write(3, str[3]);
+        
+        
+        
+        delay(200);
+        
+        
     }
-    /*else
-    {
-        lcd.clear();
-        lcd.setCursor(0, 0);
-        lcd.print("No Tag");
-        delay(500);        
-    }*/
+
+    
     
     if(relay_on)
         digitalWrite(relay_enable_pin, HIGH);
