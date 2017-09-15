@@ -23,3 +23,10 @@ What things you need to install the software and how to install them
 ## Some usefull links
 
 * https://www.addicore.com/RFID-AddiKit-p/126.htm - RFID AddiKit with RC522
+
+
+## Future plans
+
+1. Extend the range of RFID reader 
+2. Add tow more RFID readers 
+3. power the relay only when specific RFID tags are present
