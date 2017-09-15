@@ -53,11 +53,11 @@ LiquidCrystal lcd(7, 6, 5, 4, 3, 2);        // initialize the library with the n
 AddicoreRFID myRFID;                        // create AddicoreRFID object to control the RFID module
 
 
-const int chipSelectPin = 10;
+const int chipSelectPin = 10 ;
+const int relay_enable_pin = 9 ;
 
 
-
-
+boolean relay_on = false ;
 
 
 

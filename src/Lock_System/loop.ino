@@ -3,6 +3,8 @@
 void loop() {
     unsigned char str[MAX_LEN];
     unsigned char status;
+    
+
   
     status = myRFID.AddicoreRFID_Request(PICC_REQIDL, str);
 
@@ -34,8 +36,11 @@ void loop() {
         lcd.clear();
         lcd.setCursor(0, 0);
         lcd.print(String(str[0]) + "," + String(str[1]) + "," + String(str[2]) + "," + String(str[3])  );
-        delay(500);
-
+        
+        relay_on = !relay_on ;
+        
+        delay(1000);
+    
     }
     /*else
     {
@@ -45,6 +50,10 @@ void loop() {
         delay(500);        
     }*/
     
+    if(relay_on)
+        digitalWrite(relay_enable_pin, HIGH);
+    else
+        digitalWrite(relay_enable_pin, LOW);
 
 }
 //-------------------------------------------------------------------------------------------------
