@@ -1,0 +1,12 @@
+make a simple Arduino RFID reader using the RC522 Module
+https://brainy-bits.com/blogs/tutorials/card-reader-with-an-arduino-rfid-using-the-rc522-module
+
+
+Relay Module 
+http://www.microbot.it/documents/mr009-001-2_datasheet.pdf
+
+Issue sharing MISO with multiple RC522 RFID Readers
+https://arduino.stackexchange.com/questions/18313/issue-sharing-miso-with-multiple-rc522-rfid-readers
+
+Arduino RC522 RFID Door Unlock
+http://www.instructables.com/id/Arduino-RC522-RFID-Door-Unlock/
