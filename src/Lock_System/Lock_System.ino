@@ -55,7 +55,9 @@ AddicoreRFID myRFID;                        // create AddicoreRFID object to con
 
 const int chipSelectPin = 10 ;
 const int relay_enable_pin = 9 ;
+const int button = 2 ;
 
+int prev_button_state = LOW ;
 
 boolean relay_on = false ;
 

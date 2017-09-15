@@ -4,12 +4,30 @@ void loop() {
     unsigned char str[MAX_LEN];
     unsigned char status;
     
-  
-    status = myRFID.AddicoreRFID_Request(PICC_REQIDL, str);
-
-
-    status = myRFID.AddicoreRFID_Anticoll(str);
+    int button_state = digitalRead(button);
     
+    
+    // Button control 
+    //---------------------------------------
+    if(/*prev_button_state == LOW &&*/ button_state == HIGH )
+    {
+        //prev_button_state = HIGH ;
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print("Button Pressed !!!");
+        
+        //digitalWrite(relay_enable_pin, !digitalRead(relay_enable_pin) );
+        relay_on = !relay_on ;
+        
+        delay(200);        
+    }
+
+    
+    
+    // RFID read 
+    //---------------------------------------
+    status = myRFID.AddicoreRFID_Request(PICC_REQIDL, str);
+    status = myRFID.AddicoreRFID_Anticoll(str);
     if (status == MI_OK)
     {
         // Print RFID Tag to LCD
@@ -37,11 +55,17 @@ void loop() {
     }
 
     
-    
+    // Relay Control
+    //---------------------------------------
     if(relay_on)
         digitalWrite(relay_enable_pin, HIGH);
     else
         digitalWrite(relay_enable_pin, LOW);
-
+    
+    
+    
+    
+    
+    
 }
 //-------------------------------------------------------------------------------------------------
