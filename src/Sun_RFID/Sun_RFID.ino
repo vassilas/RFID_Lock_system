@@ -1,4 +1,6 @@
-/*******************************************
+/**********************************************************************************
+                                RFID LOCK SYSTEM
+***********************************************************************************
 
     LCD 
     ---------------------------------------------------
@@ -26,7 +28,10 @@
     RFID RST    Digital 5
     RFID 3.3V   3.3v
     
-****************************************/
+    Button      Digital 2
+    Relay       Digital 9
+    
+***********************************************************************************/
 
 
 #include "rfid.h"
@@ -49,6 +54,13 @@ LiquidCrystal LCD(7, 6, 5, 4, 3, 8);
 RFID rfid;
 
 
+const int relay_enable_pin = 9 ;
+const int button = 2 ;
+
+boolean relay_on = false ;
+
+
+
 
 
 
@@ -59,30 +71,82 @@ void setup()
     LCD.begin(16, 2);
     LCD.print("EEPROM DATA:");
     
+    pinMode(relay_enable_pin,OUTPUT);
+    digitalWrite(relay_enable_pin, LOW);
+    
 }
+
+
+
+
+
 
 
 void loop()
 {
     uchar status;
     uchar *str;    
+    int reader_id = 1 ;
+    int button_state = digitalRead(button);
     
-
-    str = rfid_read(1,status);
-    if(status != MI_OK)
+    
+    
+    // Button control 
+    //---------------------------------------------
+    if( button_state == HIGH )
     {
-        for(int i = 0 ; i < 4 ; i++ )
-            str[i]=0;        
+        //prev_button_state = HIGH ;
+        LCD.clear();
+        LCD.setCursor(0, 0);
+        LCD.print("Button Pressed !!!");
         
+        //digitalWrite(relay_enable_pin, !digitalRead(relay_enable_pin) );
+        relay_on = !relay_on ;
+        
+        delay(100);        
     }
     
+    
+    
+    // RFID Read 
+    //---------------------------------------------    
+    str = rfid_read(reader_id,status);                      // Read rfid tag from reader_id reader 
+    if(status != MI_OK)
+    {
+        for(int i = 0 ; i < 4 ; i++ )                       // If status not correct str = zeros 
+            str[i]=0;        
+    }
+    else
+        relay_on = !relay_on ;
+    
+    
+    
+    
+    
+    // Print Results - Tag's id 
+    //---------------------------------------------
     LCD.clear();
     LCD.setCursor(0, 0);
     LCD.print(String(str[0]) + "," + String(str[1]) + "," + String(str[2]) + "," + String(str[3])  );
+    Serial.print( String(str[0]) + "," + String(str[1]) + "," + String(str[2]) + "," + String(str[3]) + "\n");
     
     
-    delay(500);
+
+    
+    // Relay Control
+    //---------------------------------------------
+    if(relay_on)
+        digitalWrite(relay_enable_pin, HIGH);
+    else
+        digitalWrite(relay_enable_pin, LOW);
+    
+    
+    
+    
+    delay(300);
 }
+
+
 
 
 
@@ -114,7 +178,7 @@ uchar* rfid_read(int id, uchar &status)
     
     
     rfid.begin(RFID_IRQ,RFID_SCK,RFID_MOSI,miso,RFID_CS,RFID_RST);
-    rfid.init(); //initialize the RFID
+    rfid.init();
     
     
     status = rfid.request(PICC_REQIDL, str);
