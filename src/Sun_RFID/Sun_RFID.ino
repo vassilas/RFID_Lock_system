@@ -1,21 +1,5 @@
 /*******************************************
 
-* RFID   SunFounder Uno
-* VCC     3.3V
-* RST     2
-* GND     GND
-* MISO    3
-* MOSI    4
-* SCK     5
-* NSS     6
-* IRQ     7
-
-
-
-
-
-
-
     LCD 
     ---------------------------------------------------
     LCD RS pin to digital pin 7
@@ -50,13 +34,20 @@
 #include <Wire.h>
 
 
+#define RFID_IRQ 1
+#define RFID_SCK 13
+#define RFID_CS 10
+#define RFID_RST 0
+#define RFID_MOSI 11
+#define RFID_MISO_1 12
+#define RFID_MISO_2 12
+#define RFID_MISO_3 12
+
+
+
 LiquidCrystal LCD(7, 6, 5, 4, 3, 8);
 RFID rfid;
 
-
-
-
-#define relayPin 8 //relay module attach to pin8
 
 
 
@@ -68,29 +59,78 @@ void setup()
     LCD.begin(16, 2);
     LCD.print("EEPROM DATA:");
     
-    rfid.begin(1,13,11,12,10,0); //IRQ_PIN,SCK_PIN,MOSI_PIN,MISO_PIN,NSS_PIN,RST_PIN
-    delay(100);
-    rfid.init(); //initialize the RFID
-    
 }
 
 
 void loop()
 {
     uchar status;
-    uchar str[MAX_LEN];    
+    uchar *str;    
+    
+
+    str = rfid_read(1,status);
+    if(status != MI_OK)
+    {
+        for(int i = 0 ; i < 4 ; i++ )
+            str[i]=0;        
+        
+    }
+    
+    LCD.clear();
+    LCD.setCursor(0, 0);
+    LCD.print(String(str[0]) + "," + String(str[1]) + "," + String(str[2]) + "," + String(str[3])  );
+    
+    
+    delay(500);
+}
+
+
+
+
+
+uchar* rfid_read(int id, uchar &status)
+{
+
+    uchar str[4];
+    int miso = RFID_MISO_1 ;
+    
+
+    switch (id) {
+        case 1:
+            miso = RFID_MISO_1 ;
+            break;
+        case 2:
+            miso = RFID_MISO_2 ;
+            break;
+        case 3:
+            miso = RFID_MISO_3 ;
+            break;
+        default: 
+            miso = RFID_MISO_1 ;
+        break;
+    }    
+    
+    
+    
+    
+    rfid.begin(RFID_IRQ,RFID_SCK,RFID_MOSI,miso,RFID_CS,RFID_RST);
+    rfid.init(); //initialize the RFID
     
     
     status = rfid.request(PICC_REQIDL, str);
-    
     status = rfid.anticoll(str);
-    if (status == MI_OK)
-    {
-        //Serial.print("The card's number is: ");
 
-        
-        LCD.clear();
-        LCD.setCursor(0, 0);
-        LCD.print(String(str[0]) + "," + String(str[1]) + "," + String(str[2]) + "," + String(str[3])  );
-    }
+    
+    return str;
 }
+
+
+
+
+
+
+
+
+
+
+
