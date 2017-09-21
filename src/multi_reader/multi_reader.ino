@@ -12,6 +12,7 @@
  * SS_1                     10
  * SS_2                     8
  * SS_3                     7
+ * BUTTON                   2
  */         
 //-------------------------------------------------------------------------------------------------
 
@@ -24,9 +25,12 @@
 //
 //-------------------------------------------------------------------------------------------------
 const uint8_t RST_PIN = 9;
+
 const uint8_t SS_1_PIN = 10;
 const uint8_t SS_2_PIN = 8;
 const uint8_t SS_3_PIN = 7;
+
+const uint8_t button = 2;
 
 //
 //-------------------------------------------------------------------------------------------------
@@ -47,6 +51,8 @@ void setup()
     
     SPI.begin();
     
+    pinMode(button,INPUT);
+    
     print_serial_eeprom(0);
     print_serial_eeprom(4);
     print_serial_eeprom(8);
@@ -63,7 +69,7 @@ void setup()
 //-------------------------------------------------------------------------------------------------
 void loop() 
 {
-
+    
     for (uint8_t reader = 0; reader < NR_OF_READERS; reader++) {
     
         if (mfrc522[reader].PICC_IsNewCardPresent() && mfrc522[reader].PICC_ReadCardSerial())
@@ -75,9 +81,13 @@ void loop()
                                 };
                                 
             print_serial_card_id( reader , card_id);
+            delay(200);
             
-            eeprom_write( (unsigned int)reader << 2 , card_id );
-
+            if( digitalRead(button) == HIGH )
+            {
+                Serial.print("\n> Register Card on Reeader : " + String(reader));
+                eeprom_write( (unsigned int)reader << 2 , card_id );
+            }
         }
     }
 }
