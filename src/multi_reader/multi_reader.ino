@@ -13,6 +13,7 @@
  * SS_2                     8
  * SS_3                     7
  * BUTTON                   2
+ * RELAY                    3   
  */         
 //-------------------------------------------------------------------------------------------------
 
@@ -31,6 +32,7 @@ const uint8_t SS_2_PIN = 8;
 const uint8_t SS_3_PIN = 7;
 
 const uint8_t button = 2;
+const uint8_t relay = 3;
 
 //
 //-------------------------------------------------------------------------------------------------
@@ -52,6 +54,9 @@ void setup()
     SPI.begin();
     
     pinMode(button,INPUT);
+    pinMode(relay,OUTPUT);
+    
+    digitalWrite(relay, LOW);
     
     print_serial_eeprom(0);
     print_serial_eeprom(4);
@@ -69,6 +74,8 @@ void setup()
 //-------------------------------------------------------------------------------------------------
 void loop() 
 {
+    byte cards[NR_OF_READERS][4] ;
+    int count = 0 ;
     
     for (uint8_t reader = 0; reader < NR_OF_READERS; reader++) {
     
@@ -83,13 +90,34 @@ void loop()
             print_serial_card_id( reader , card_id);
             delay(200);
             
+            
+            for(int i = 0 ; i < 4 ; i++ )
+                cards[reader][i] = card_id[i];
+            
+            
             if( digitalRead(button) == HIGH )
             {
                 Serial.print("\n> Register Card on Reeader : " + String(reader));
                 eeprom_write( (unsigned int)reader << 2 , card_id );
             }
+        }else
+        {
+            if( digitalRead(button) == HIGH )
+                Serial.print("\nERROR : At least one of the reader does not scan any RFID-tag");
         }
     }
+    
+    if( digitalRead(button) == HIGH )
+        Serial.print("\nfghgfff");
+    
+    for(int reader = 0 ; reader < NR_OF_READERS ; reader++)
+        for(int field = 0 ; field < 4 ; field++ )
+            if( cards[reader][field] == (byte)EEPROM.read(reader*4 + field) )
+                count++ ;
+
+    
+    if(count == NR_OF_READERS*4)
+        digitalWrite(relay, HIGH);
 }
 
 
