@@ -24,6 +24,13 @@
 #include <MFRC522.h>
 #include <EEPROM.h>
 
+// -- DEBUGGING MODE --
+//
+// Uncomment the following define to enter the debug mode
+// Messeges will be printed to serial monitor 
+//-------------------------------------------------------
+#define DEBUG
+//-------------------------------------------------------
 
 #define TRUE 1
 #define FALSE 0
@@ -68,11 +75,12 @@ void setup()
     
     digitalWrite(relay, LOW);
     digitalWrite(led, HIGH);
-    
+
+#ifdef DEBUG  
     print_serial_eeprom(0);
     print_serial_eeprom(4);
     print_serial_eeprom(8);
-    
+#endif
     
     for (uint8_t reader = 0; reader < NR_OF_READERS; reader++)
         mfrc522[reader].PCD_Init(ssPins[reader], RST_PIN);
@@ -148,6 +156,15 @@ void loop()
             if( cards[reader][field] == (byte)EEPROM.read(reader*4 + field) )
                 count++ ;
 
+    // LED CONTROL 
+    // Indicates if all readers are recognize a tag
+    //----------------------------------------------
+    if(valid_read_count == NR_OF_READERS)
+        digitalWrite(led, HIGH);
+    else
+        digitalWrite(led, LOW); 
+
+
     // RELAY CONTROL
     //----------------------------------------------
     if(count == NR_OF_READERS*4)
@@ -165,13 +182,7 @@ void loop()
             }
     }    
 
-    // LED CONTROL 
-    // Indicates if all readers are recognize a tag
-    //----------------------------------------------
-    if(valid_read_count == NR_OF_READERS)
-        digitalWrite(led, HIGH);
-    else
-        digitalWrite(led, LOW);   
+  
 
 
      
