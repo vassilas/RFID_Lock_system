@@ -13,7 +13,8 @@
  * SS_2                     8
  * SS_3                     7
  * BUTTON                   2
- * RELAY                    3   
+ * RELAY                    3  
+ * LED                      4
  */         
 //-------------------------------------------------------------------------------------------------
 
@@ -22,6 +23,10 @@
 #include <SPI.h>
 #include <MFRC522.h>
 #include <EEPROM.h>
+
+
+#define TRUE 1
+#define FALSE 0
 
 //
 //-------------------------------------------------------------------------------------------------
@@ -33,11 +38,15 @@ const uint8_t SS_3_PIN = 7;
 
 const uint8_t button = 2;
 const uint8_t relay = 3;
+const uint8_t led = 4;
 
 //
 //-------------------------------------------------------------------------------------------------
 const uint8_t NR_OF_READERS = 3;
 byte ssPins[] = {SS_1_PIN, SS_2_PIN, SS_3_PIN};
+
+unsigned int relay_on_loops = 10 ;           // 0        : turn of ,
+                                            // > 0      : turn on 
 
 MFRC522 mfrc522[NR_OF_READERS];   
 
@@ -55,8 +64,10 @@ void setup()
     
     pinMode(button,INPUT);
     pinMode(relay,OUTPUT);
+    pinMode(led,OUTPUT);
     
     digitalWrite(relay, LOW);
+    digitalWrite(led, HIGH);
     
     print_serial_eeprom(0);
     print_serial_eeprom(4);
@@ -76,48 +87,94 @@ void loop()
 {
     byte cards[NR_OF_READERS][4] ;
     int count = 0 ;
-    
+    int valid_read_count = 0 ;
+
+    for(int i=0 ; i < NR_OF_READERS ; i++ )
+        for(int j=0 ; j < 4 ; j++ )
+            cards[i][j] = (byte)0;
+
+
     for (uint8_t reader = 0; reader < NR_OF_READERS; reader++) {
-    
-        if (mfrc522[reader].PICC_IsNewCardPresent() && mfrc522[reader].PICC_ReadCardSerial())
+        
+        bool tag_pressent = FALSE ;
+
+        for( uint8_t i = 0 ; i <= 1 ; i++)
         {
-            byte card_id[] =    {   mfrc522[reader].uid.uidByte[0] ,
-                                    mfrc522[reader].uid.uidByte[1] ,
-                                    mfrc522[reader].uid.uidByte[2] ,
-                                    mfrc522[reader].uid.uidByte[3] ,
-                                };
-                                
-            print_serial_card_id( reader , card_id);
-            delay(200);
-            
-            
-            for(int i = 0 ; i < 4 ; i++ )
-                cards[reader][i] = card_id[i];
-            
-            
-            if( digitalRead(button) == HIGH )
+            if (mfrc522[reader].PICC_IsNewCardPresent() && mfrc522[reader].PICC_ReadCardSerial())
             {
-                Serial.print("\n> Register Card on Reeader : " + String(reader));
-                eeprom_write( (unsigned int)reader << 2 , card_id );
+                
+                tag_pressent = TRUE ;
+                valid_read_count++;
+
+                byte card_id[] =    {   mfrc522[reader].uid.uidByte[0] ,
+                                        mfrc522[reader].uid.uidByte[1] ,
+                                        mfrc522[reader].uid.uidByte[2] ,
+                                        mfrc522[reader].uid.uidByte[3] ,
+                                    };
+                 
+         
+                print_serial_card_id( reader , card_id);
+                delay(200);
+                
+                
+                for(int i = 0 ; i < 4 ; i++ )
+                    cards[reader][i] = card_id[i];
+                
+                
+                if( digitalRead(button) == HIGH )
+                {
+                    Serial.print("\n> Register Card on Reeader : " + String(reader));
+                    eeprom_write( (unsigned int)reader << 2 , card_id );
+                }
             }
-        }else
+        }
+        
+
+        if(!tag_pressent)
         {
             if( digitalRead(button) == HIGH )
                 Serial.print("\nERROR : At least one of the reader does not scan any RFID-tag");
         }
+
     }
     
+
+
     if( digitalRead(button) == HIGH )
-        Serial.print("\nfghgfff");
+        Serial.print("\nButton Pressed");
     
     for(int reader = 0 ; reader < NR_OF_READERS ; reader++)
         for(int field = 0 ; field < 4 ; field++ )
             if( cards[reader][field] == (byte)EEPROM.read(reader*4 + field) )
                 count++ ;
 
-    
+    // RELAY CONTROL
+    //----------------------------------------------
     if(count == NR_OF_READERS*4)
+    {
         digitalWrite(relay, HIGH);
+        
+
+        // Add a dellay for relay to stay on
+        //--------------------------------------------------------
+        if(relay_on_loops > 0 )
+            for(unsigned int i = 0 ; i <= relay_on_loops ; i++)
+            {
+                delay(200);
+                if(i == relay_on_loops ) digitalWrite(relay, LOW);    
+            }
+    }    
+
+    // LED CONTROL 
+    // Indicates if all readers are recognize a tag
+    //----------------------------------------------
+    if(valid_read_count == NR_OF_READERS)
+        digitalWrite(led, HIGH);
+    else
+        digitalWrite(led, LOW);   
+
+
+     
 }
 
 
@@ -174,4 +231,17 @@ void wipe_eeprom()
         EEPROM.write(i,0);
 
 }
+
+
+
+
+
+/*
+    Notes:
+        - Command to aneble write to USB port where arduino is connected:
+            > sudo chown vasilas /dev/ttyUSB0
+
+
+
+*/
 
