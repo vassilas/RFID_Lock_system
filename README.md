@@ -17,8 +17,9 @@ What things you need to install the software and how to install them
 1) Arduino IDE
 2) AddicoreRFID library
 ```
+## Schematic Image
 
-
+![alt text](https://raw.githubusercontent.com/vassilas/RFID_Lock_system/master/Gallery/sch_img.png)
 
 ## Some usefull links
 
