@@ -21,6 +21,10 @@ What things you need to install the software and how to install them
 
 ![alt text](https://raw.githubusercontent.com/vassilas/RFID_Lock_system/master/Gallery/sch_img.png)
 
+## Layout Image
+
+![alt text](https://raw.githubusercontent.com/vassilas/RFID_Lock_system/master/Gallery/pcb_layout_4.png)
+
 ## Some usefull links
 
 * https://www.addicore.com/RFID-AddiKit-p/126.htm - RFID AddiKit with RC522
