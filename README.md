@@ -6,8 +6,8 @@ specific rfid reader's potitions .
 
 ## Getting Started
 
-The wiringn is described in the source code (<project_folder>/src) 
-An LCD is used for testing the status of the system .
+The wirign is described in the source code (<project_folder>/src) 
+Serial Monitor is used for testing the status of the system .
 
 ### Prerequisites
 
@@ -16,6 +16,7 @@ What things you need to install the software and how to install them
 ```
 1) Arduino IDE
 2) AddicoreRFID library
+3) RFID livrary
 ```
 ## Schematic Image
 
