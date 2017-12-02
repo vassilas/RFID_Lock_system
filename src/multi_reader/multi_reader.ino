@@ -83,9 +83,12 @@ void setup()
 #endif
     
     for (uint8_t reader = 0; reader < NR_OF_READERS; reader++)
+    {
+        mfrc522[reader].PCD_SetAntennaGain((byte)0x7);
         mfrc522[reader].PCD_Init(ssPins[reader], RST_PIN);
-}
 
+    }
+}
 
 
 
@@ -174,14 +177,14 @@ void loop()
 
         // Add a dellay for relay to stay on
         //--------------------------------------------------------
-        if(relay_on_loops > 0 )
-            for(unsigned int i = 0 ; i <= relay_on_loops ; i++)
-            {
-                delay(200);
-                if(i == relay_on_loops ) digitalWrite(relay, LOW);    
-            }
+        //if(relay_on_loops > 0 )
+        //    for(unsigned int i = 0 ; i <= relay_on_loops ; i++)
+        //    {
+        //        delay(200);
+        //        if(i == relay_on_loops ) digitalWrite(relay, LOW);    
+         //   }
     }    
-
+    else digitalWrite(relay, LOW);
   
 
 

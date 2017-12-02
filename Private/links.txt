@@ -13,3 +13,11 @@ http://www.instructables.com/id/Arduino-RC522-RFID-Door-Unlock/
 
 Electronics Store
 https://www.hellasdigital.gr
+
+
+
+
+---------------------------------------
+OTHER RFID READER MODULE
+---------------------------------------
+http://tronixstuff.com/2013/11/19/arduino-tutorials-chapter-15-rfid/
